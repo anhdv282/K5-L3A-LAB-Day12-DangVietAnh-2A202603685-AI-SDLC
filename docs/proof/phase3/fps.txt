@@ -1,0 +1,1 @@
+{"night":1,"avg_fps":60.1,"seconds":15,"frames":902,"size":"1280x720","renderer":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","measured_at":"2026-11-20T09:21:09.251Z","pass_30fps":true}
