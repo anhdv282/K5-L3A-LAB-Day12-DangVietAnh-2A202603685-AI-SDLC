@@ -91,7 +91,7 @@ test('shade states use contract names: spawning -> wander -> chase -> recoil, an
   assert.ok(seen.has('wander') || seen.has('chase'));
   const h = mk(1, { shades: [{ id: 'S1', pos: [0.5, 0, 0], state: 'chase' }] }); h.step({});
   assert.equal(h.snapshot().shades[0].state, 'recoil');
-  for (const st of h.snapshot().shades.map(x => x.state)) assert.ok(['spawning', 'wander', 'chase', 'recoil', 'stunned'].includes(st));
+  for (const st of h.snapshot().shades.map(x => x.state)) assert.ok(['spawning', 'wander', 'chase', 'recoil', 'stunned', 'drain'].includes(st));   // [Ticket-03] + drain
 });
 
 test('safe zone: shade inside a newly lit lantern is evicted to the 6 m edge within 30 ticks without dealing damage', () => {
@@ -154,29 +154,34 @@ test('pause: tick advances but sim_tick/time/cooldowns freeze; snapshot state "p
   assert.deepEqual(r.events.filter(e => ['paused', 'resumed'].includes(e.type)).map(e => [e.type, e.tick]), [['paused', 20], ['resumed', 50]]);
   assert.equal(r.ticks, 100); assert.equal(r.sim_ticks, 70);
   assert.equal(r.snapshots.find(x => x.tick === 30).state, 'paused');
-  assert.ok(near(r.final.time_left_s, 300 - 70 / 60, 1e-3));
+  assert.ok(near(r.final.time_left_s, 240 - 70 / 60, 1e-3));   // [Ticket-03] Night 1 = 240 s
   assert.equal(r.final.player.pulse_cd_s, 0);
 });
 
-test('win/lose order: all lanterns lit on the exact tick time runs out => win', () => {
+// [Ticket-03] win is now decided only at dawn (dawn_survived) and the score formula was replaced; the tick-order idea is kept.
+test('win/lose order: last lantern lit on the exact dawn tick => win dawn_survived (Ticket-03 scoring)', () => {
   const lanterns = ['L2', 'L3', 'L4', 'L5'].map(id => ({ id, charge: 10 })).concat([{ id: 'L1', charge: 9 }]);
   const s = mk(1, { lanterns, time_left_s: 1 / 60, player: { pos: [0, 0, 23.5], carried: 1 } });
   s.step({ interact: true });
-  assert.equal(s.state.status, 'won');
-  assert.equal(s.score().total, 10 + 100 + 0 * 2 + 3 * 50);
+  assert.deepEqual([s.state.status, s.state.reason], ['won', 'dawn_survived']);
+  // 1 mote x5 + first light 100 + dawn: 4 lanterns (50 + floor 99.98) + L1 (50 + 100) + 3 flames x 50
+  assert.equal(s.score().total, 5 + 100 + 4 * 149 + 150 + 150);
 });
 
 test('night chain data: nights 2 and 3 load their maps (6 and 7 lanterns, charms, durations)', () => {
   const n2 = createSim(T, { night: 2 }).snapshot(), n3 = createSim(T, { night: 3 }).snapshot();
   assert.equal(n2.lanterns.length, 6); assert.equal(n3.lanterns.length, 7);
   assert.deepEqual(n2.charms.map(c => c.id), ['C1']); assert.deepEqual(n3.charms.map(c => c.id), ['C1', 'C2']);
-  assert.equal(n2.time_left_s, 330); assert.equal(n3.time_left_s, 360);
+  assert.equal(n2.time_left_s, 270); assert.equal(n3.time_left_s, 300);   // [Ticket-03]
   assert.equal(runScenario({ night: 2, ticks: 1 }).events[0].type, 'night_start');
 });
 
-test('performance: a full night (21,600 ticks) runs headless in <= 30 s', () => {
+// [Ticket-03] Night 3 now lasts 300 s = 18,000 ticks, so a 21,600-tick night no longer exists; we run the longest night
+// to dawn, plus a 21,600-tick run that includes 3,600 paused ticks (paused ticks still count) to keep the original budget.
+test('performance: the longest night runs headless in <= 30 s (also a 21,600-tick run incl. pause)', () => {
   const t0 = Date.now();
-  const r = runScenario({ night: 3, seed: 1, ticks: 21600, snapshot_every: 60, player: { flames: 1e9 } });
+  const r = runScenario({ night: 3, seed: 1, snapshot_every: 60, player: { flames: 1e9 } });
+  const r2 = runScenario({ night: 3, seed: 1, ticks: 21600, snapshot_every: 60, player: { flames: 1e9 }, inputs: [{ tick: 1, pause: true }, { tick: 2 }, { tick: 3601, pause: true }, { tick: 3602 }] });
   const ms = Date.now() - t0;
-  assert.equal(r.ticks, 21600); assert.ok(ms <= 30000, `${ms} ms`);
+  assert.equal(r.sim_ticks, 18000); assert.equal(r2.ticks, 21600); assert.ok(ms <= 30000, `${ms} ms`);
 });

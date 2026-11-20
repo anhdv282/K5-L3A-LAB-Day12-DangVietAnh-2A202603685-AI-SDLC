@@ -12,14 +12,15 @@ const calm = { spawn_shades: false, spawn_motes: false, random_drifters: false, 
 const sim1 = (scenario = {}) => createSim(T, { night: 1, seed: 1, scenario: { ...calm, ...scenario } });
 const run = (n, f) => { for (let i = 0; i < n; i++) f(); };
 
-test('contract 1.1: standard tuning values', () => {
-  assert.equal(CONTRACT.contract_version, '1.1');
+// [Ticket-03] contract 1.1 -> 1.2: version, night durations 240/270/300 and the score table were replaced (CHANGELOG).
+test('contract 1.2: standard tuning values (Ticket-02 numbers kept, Ticket-03 durations/score)', () => {
+  assert.equal(CONTRACT.contract_version, '1.2');
   const want = { player_speed: 6, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1, interact_radius: 2,
-    pulse_cost: 3, pulse_radius: 5, night1_duration_s: 300, night2_duration_s: 330, night3_duration_s: 360, flames: 3, invuln_s: 1.5,
+    pulse_cost: 3, pulse_radius: 5, night1_duration_s: 240, night2_duration_s: 270, night3_duration_s: 300, flames: 3, invuln_s: 1.5,
     hit_drop_ratio: 0.5, pulse_stun_s: 2, pulse_push_m: 4, pulse_cooldown_s: 3, safe_radius: 6, shade_speed: 4, shade_hit_radius: 1,
     fall_enabled: true, dash_speed: 14, dash_duration_s: 0.2, dash_cooldown_s: 1.5 };
   for (const [k, v] of Object.entries(want)) assert.equal(T[k], v, k);
-  assert.deepEqual(T.score, { per_mote: 10, per_lantern: 100, per_stun: 5, per_second_left: 2, per_flame_left: 50 });
+  assert.deepEqual(T.score, { per_mote: 5, per_lantern: 100, per_stun: 5, per_second_left: 0, per_flame_left: 50 });   // same key set as v1.0/v1.1
 });
 
 test('night 1 map: 5 lanterns at standard positions, start (0,0,0) facing +Z, 20 motes on spawn points', () => {
@@ -55,7 +56,7 @@ test('interact: radius 2.0, feeds min(carried, missing), lantern remembers progr
   s.step({ interact: true }); assert.equal(s.state.lanterns[0].charge, 6);
   s.step({}); s.state.player.carried = 7; s.step({ interact: true });
   assert.equal(s.state.lanterns[0].lit, true); assert.equal(s.state.player.carried, 3);
-  assert.equal(s.score().total, 10 * 10 + 100);   // +10 per mote deposited, +100 per lantern
+  assert.equal(s.score().total, 10 * 5 + 100);   // [Ticket-03] +5 per mote deposited (was +10), +100 first light
   const far = sim1({ player: { pos: [0, 0, 22.9], carried: 5 } }); far.step({ interact: true });
   assert.equal(far.state.player.carried, 5);
 });
@@ -74,15 +75,17 @@ test('lose no_flames; lose dawn when time runs out', () => {
   const s = sim1({ player: { flames: 1 }, shades: [{ id: 'S1', pos: [0.2, 0, 0], state: 'chase' }] }); s.step({});
   assert.deepEqual([s.state.status, s.state.reason], ['lost', 'no_flames']);
   const r = runScenario({ ...calm, night: 1, ticks: 20000 });
-  assert.deepEqual([r.result, r.reason, r.sim_ticks], ['lose', 'dawn', 18000]);
+  assert.deepEqual([r.result, r.reason, r.sim_ticks], ['lose', 'dawn', 14400]);   // [Ticket-03] Night 1 is 240 s (was 300)
 });
 
 test('determinism: same scenario twice => identical output (all 3 nights)', () => {
   for (const night of [1, 2, 3]) assert.deepEqual(runScenario({ night, seed: 5, bot: true, ticks: 4000 }), runScenario({ night, seed: 5, bot: true, ticks: 4000 }));
 });
 
-test('autopilot can win night 1 (game completable)', () => {
-  assert.equal(runScenario({ night: 1, seed: 1, bot: true, snapshot_every: 0 }).result, 'win');
+// [Ticket-03] no early win any more: the bot must keep >= 3/5 lanterns lit until dawn.
+test('autopilot can win night 1 at dawn (game completable)', () => {
+  const r = runScenario({ night: 1, seed: 1, bot: true, snapshot_every: 0 });
+  assert.deepEqual([r.result, r.reason], ['win', 'dawn_survived']);
 });
 
 test('CLI: scenario files run, output JSON with contract fields, identical across runs', () => {
@@ -90,7 +93,7 @@ test('CLI: scenario files run, output JSON with contract fields, identical acros
     const go = () => execFileSync('node', ['src/headless.js', '--scenario', `scenarios/${f}.json`], { encoding: 'utf8' });
     const a = go(); assert.equal(a, go());
     const j = JSON.parse(a);
-    assert.equal(j.contract_version, '1.1');
+    assert.equal(j.contract_version, CONTRACT.contract_version);   // [Ticket-03] 1.1 -> 1.2
     for (const k of ['night', 'wind', 'player', 'motes', 'drifters', 'charms', 'shades', 'lanterns']) assert.ok(k in j.final, k);
     for (const k of ['vel', 'grounded', 'invuln', 'dash_cd_s', 'pulse_cd_s', 'charm_s']) assert.ok(k in j.final.player, k);
   }

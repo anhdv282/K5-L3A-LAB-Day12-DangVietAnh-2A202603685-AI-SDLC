@@ -23,14 +23,17 @@ test('phase 1 fixtures: every scenario runs, has all Phase 1 output fields, dete
   }
 });
 
-test('phase 1 win_bot: autopilot still wins Night 1 (seed 1) with standard numbers', () => {
+// [Ticket-03] "win = all 5 lit" was replaced by "alive at dawn with >= 3/5 lit"; lose_reason is null on a win, reason dawn_survived.
+test('phase 1 win_bot: autopilot still wins Night 1 (seed 1) under the current rules', () => {
   const r = run('--scenario', 'tests/fixtures/phase1/win_bot.json');
-  assert.equal(r.result, 'win'); assert.equal(r.lanterns_lit, 5); assert.equal(r.lose_reason, null);
+  assert.equal(r.result, 'win'); assert.ok(r.lanterns_lit >= 3); assert.equal(r.reason, 'dawn_survived'); assert.equal(r.lose_reason, null);
 });
 
-test('phase 1 idle_lose: standing still loses all flames (reason renamed by Ticket-02: no_flames)', () => {
+// [Ticket-03] wandering shades now head for lanterns instead of roaming (Ticket-03 §2), so an idle Mây in the centre is
+// no longer always caught. The Phase 1 intent "doing nothing loses" still holds: 0 lanterns lit at dawn => lose (dawn).
+test('phase 1 idle_lose: doing nothing still loses (no_flames or, since Ticket-03, dawn with 0 lanterns lit)', () => {
   const r = run('--scenario', 'tests/fixtures/phase1/idle_lose.json');
-  assert.equal(r.result, 'lose'); assert.equal(r.flames, 0); assert.equal(r.lose_reason, 'no_flames');
+  assert.equal(r.result, 'lose'); assert.ok(['no_flames', 'dawn'].includes(r.lose_reason)); assert.equal(r.lanterns_lit, 0);
 });
 
 test('phase 1 walk_jump_pulse: "steps" are executed (move, jump, pulse with no light, moveTo), events listed', () => {
