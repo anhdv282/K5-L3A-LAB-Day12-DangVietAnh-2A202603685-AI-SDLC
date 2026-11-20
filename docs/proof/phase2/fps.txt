@@ -1,0 +1,4 @@
+# node scripts/fps.mjs <night> 20  — Chrome headless, hardware GPU, viewport 1280x720, autopilot playing
+{"night":1,"avg_fps":60,"seconds":20,"frames":1201,"size":"1280x720","renderer":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","measured_at":"2026-11-20T08:44:55.110Z","pass_30fps":true}
+{"night":2,"avg_fps":59.8,"seconds":20,"frames":1197,"size":"1280x720","renderer":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","measured_at":"2026-11-20T08:45:18.870Z","pass_30fps":true}
+{"night":3,"avg_fps":60.1,"seconds":20,"frames":1202,"size":"1280x720","renderer":"ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)","measured_at":"2026-11-20T08:45:42.623Z","pass_30fps":true}

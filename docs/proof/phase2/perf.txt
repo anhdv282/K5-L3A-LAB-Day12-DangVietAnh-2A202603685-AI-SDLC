@@ -1,0 +1,4 @@
+Darwin arm64
+Apple M4
+v26.12.1
+night 3, 21600 ticks: 166 ms (limit 30000 ms)

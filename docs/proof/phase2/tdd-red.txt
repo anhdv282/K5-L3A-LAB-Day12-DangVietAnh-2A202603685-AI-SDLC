@@ -1,0 +1,22 @@
+✖ render layer drives logic only through createSim/createCampaign + step() and owns no scoring rule (0.475542ms)
+✖ no copyrighted/external audio is referenced by the game (0.125375ms)
+✖ tests/campaign.test.js (65.335792ms)
+✖ phase 1 fixtures: every scenario runs, has all Phase 1 output fields, deterministic (173.461084ms)
+✖ phase 1 win_bot: autopilot still wins Night 1 (seed 1) with standard numbers (112.471666ms)
+✖ phase 1 idle_lose: standing still loses all flames (reason renamed by Ticket-02: no_flames) (69.453208ms)
+✖ phase 1 walk_jump_pulse: "steps" are executed (move, jump, pulse with no light, moveTo), events listed (70.411542ms)
+✖ phase 1 CLI flags still work: --seed --bot --max-seconds --events --out (43.228959ms)
+✖ phase 1 event names kept where Ticket-02 does not rename them: pickup, deposit, lantern_lit, pulse, shade_spawn, win, lose (41.992584ms)
+ℹ tests 41
+ℹ pass 32
+ℹ fail 9
+✖ failing tests:
+✖ render layer drives logic only through createSim/createCampaign + step() and owns no scoring rule (0.475542ms)
+✖ no copyrighted/external audio is referenced by the game (0.125375ms)
+✖ tests/campaign.test.js (65.335792ms)
+✖ phase 1 fixtures: every scenario runs, has all Phase 1 output fields, deterministic (173.461084ms)
+✖ phase 1 win_bot: autopilot still wins Night 1 (seed 1) with standard numbers (112.471666ms)
+✖ phase 1 idle_lose: standing still loses all flames (reason renamed by Ticket-02: no_flames) (69.453208ms)
+✖ phase 1 walk_jump_pulse: "steps" are executed (move, jump, pulse with no light, moveTo), events listed (70.411542ms)
+✖ phase 1 CLI flags still work: --seed --bot --max-seconds --events --out (43.228959ms)
+✖ phase 1 event names kept where Ticket-02 does not rename them: pickup, deposit, lantern_lit, pulse, shade_spawn, win, lose (41.992584ms)

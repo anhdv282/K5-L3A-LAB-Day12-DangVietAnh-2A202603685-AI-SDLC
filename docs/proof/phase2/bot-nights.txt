@@ -1,0 +1,18 @@
+night 1 seed 1: win  ticks=14631 lit=5/5 score=1277
+night 1 seed 2: win  ticks=13301 lit=5/5 score=1346
+night 1 seed 3: lose dawn ticks=18000 lit=4/5 score=880
+night 1 seed 4: lose dawn ticks=18000 lit=0/5 score=50
+night 1 seed 5: win  ticks=14135 lit=5/5 score=1313
+night 1 seed 6: win  ticks=14199 lit=5/5 score=1311
+night 2 seed 1: lose no_flames ticks=9316 lit=2/6 score=430
+night 2 seed 2: lose no_flames ticks=15823 lit=3/6 score=715
+night 2 seed 3: lose dawn ticks=19800 lit=4/6 score=880
+night 2 seed 4: lose dawn ticks=19800 lit=3/6 score=750
+night 2 seed 5: lose no_flames ticks=15507 lit=3/6 score=690
+night 2 seed 6: lose dawn ticks=19800 lit=3/6 score=640
+night 3 seed 1: lose no_flames ticks=10317 lit=0/7 score=135
+night 3 seed 2: lose no_flames ticks=14046 lit=1/7 score=315
+night 3 seed 3: lose no_flames ticks=3979 lit=1/7 score=205
+night 3 seed 4: lose no_flames ticks=1613 lit=0/7 score=10
+night 3 seed 5: lose no_flames ticks=2955 lit=0/7 score=20
+night 3 seed 6: lose no_flames ticks=4470 lit=0/7 score=35
