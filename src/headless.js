@@ -73,7 +73,7 @@ export function runScenario(scn = {}, tuning = CONTRACT.tuning) {
     ticks: s.tick, sim_ticks: s.simTick,
     lanterns_lit: s.lanterns.filter(l => l.lit).length, lantern_count: s.lanterns.length,
     // Phase 1 fields (kept for regression)
-    lose_reason: s.reason, time_s: +(s.simTick / 60).toFixed(3), time_left_s: final.time_left_s,
+    lose_reason: s.status === 'lost' ? s.reason : null, /* null on a win; `reason` carries dawn_survived */ time_s: +(s.simTick / 60).toFixed(3), time_left_s: final.time_left_s,
     lantern_charge: s.lanterns.map(l => l.charge), flames: s.player.flames, carried: s.player.carried,
     motes_collected: s.stats.picked, stuns: s.stats.pulseHits, hits: s.stats.hits, pulses: events.filter(e => e.type === 'pulse').length,
     player: { x: final.player.pos[0], z: final.player.pos[2] },
