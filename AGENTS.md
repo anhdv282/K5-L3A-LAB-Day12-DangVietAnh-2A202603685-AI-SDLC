@@ -1,12 +1,13 @@
 # AGENTS.md — Đảo Đèn Lồng
 
-Game 3D (three.js), 3 Đêm, Test Contract = `game.contract.json` (v1.2). Node ≥ 20, không framework.
+Game 3D (three.js), 3 Đêm, Test Contract = `game.contract.json` (v1.3). Node ≥ 20, không framework.
 
 ## Lệnh
 - Cài: `npm install` · Chạy game: `npm start` → http://localhost:5173
 - Test (unit + scenario + tất định): `npm test`
 - Headless: `node src/headless.js --night 2 --scenario scenarios/p2_drifter.json` (xem `--help`)
-- Sinh lại bằng chứng: `./scripts/proof.sh 3` (ghi vào `docs/proof/phase3/`) · Đo FPS: `node scripts/fps.mjs 3 20`
+- Sinh lại bằng chứng: `./scripts/proof.sh 4` (ghi vào `docs/proof/phase4/`) 
+- Bench: `node scripts/bench.mjs --seed 42 --duration 30 --out bench.json` · Soak: `npm run soak` · Trình duyệt: `node scripts/e2e.mjs`
 
 ## Ba điều bắt buộc + bản quyền
 1. **Game đúng yêu cầu**: khách chấm theo yêu cầu đã nêu, không chấm độ lung linh. Làm đúng và chứng minh được trước, trau chuốt sau.
@@ -39,5 +40,6 @@ Logic game phải chạy độc lập với thư viện đồ họa để phục
 - Dầu đèn lưu bằng số nguyên đơn vị 1/60 (`fuelUnits`); không dùng float cho bộ đếm luật.
 - **Kiểm chứng trước khi code:** viết test cho yêu cầu mới, chạy thấy đỏ, lưu kết quả đỏ, rồi mới code.
 - Bài học: khi test đỏ, kiểm tra **kỳ vọng của test** trước (đã 3 lần test sai: khoảng cách, off-by-one tick) rồi mới sửa luật.
+- Cảnh benchmark phải tắt mọi thứ sáng tạo (`BENCH_MODE`) và không đổi luật; `bench.json`/`soak.json` chỉ do script sinh, không sửa tay.
 - Không dùng nhân vật/nhạc có bản quyền (RULES §8). Asset mới ghi vào `CREDITS.md`.
 - Commit nhỏ, mỗi commit một việc.
