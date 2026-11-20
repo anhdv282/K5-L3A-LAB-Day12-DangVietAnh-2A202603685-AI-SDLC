@@ -1,5 +1,26 @@
 # Changelog
 
+## Phase 4 — Ticket-04 "Phát hành" (Contract v1.3) → v1.0.0
+
+### Thêm
+- **Contract v1.3:** `bench_cmd`, `soak_cmd`; `run_cmd` đổi thành `node server.js` để nhận `--export-leaderboard` (`npm start` vẫn dùng được). Mọi khóa v1.0–v1.2 giữ nguyên.
+- **Benchmark** (`scripts/bench.mjs`, `src/core/bench.js`): cảnh chuẩn Đêm 1 (200 Bóng Mực wander, 100 đom đóm, L1–L3 sáng fuel 100; không sinh thêm/sát thương/nhặt/hao dầu/kết thúc), camera bay vòng, 3 s khởi động, `bench.json` đúng định nghĩa `avg_fps`, `p1_low_fps`, `frame_ms_p95`.
+- **Soak** (`scripts/soak.mjs`, `src/core/soak.js`): 10 Đêm xoay vòng, seed 7+i, input ngẫu nhiên theo seed, `soak.json`.
+- **Bảng xếp hạng** (`src/core/leaderboard.js`, `server.js`): top 10, lưu `data/leaderboard.json`, màn hình từ menu, nhập tên sau Bình Minh hoặc khi thua, `--export-leaderboard`.
+- **Dễ tiếp cận:** đổi 9 phím + báo trùng + khôi phục mặc định (lưu), phụ đề + mũi tên mép màn hình, giảm chuyển động, chữ ≥ 18 px, chữ lớn ×1.25.
+- Render dùng `InstancedMesh` cho Bóng Mực và đom đóm (200 Bóng Mực + 100 đom đóm ở hàng trăm FPS).
+- `scripts/e2e.mjs`: 19 kiểm tra trình duyệt (phím, phụ đề, flash, cỡ chữ, bảng xếp hạng trên đĩa).
+
+### Thay đổi có thể nhận thấy (không phải luật)
+| Thay đổi | Lý do |
+|---|---|
+| `contract_version` 1.2 → 1.3, `run_cmd` `npm start` → `node server.js` | Ticket-04; test `contract` sửa kèm nhãn `[Ticket-04]` |
+| Cỡ chữ UI tăng lên ≥ 18 px, nút Lướt/Tỏa sáng rộng hơn | Yêu cầu accessibility |
+| Phím tạm dừng đọc từ cài đặt (mặc định Esc); phím `P`/`Q` cũ không còn mặc định | Đổi phím; mặc định theo README |
+| `soak_cmd` có cờ `--jitless --max-semi-space-size=1` | Giữ RSS ổn định, xem README mục Soak |
+
+Luật, số liệu, bản đồ, đầu ra headless **không đổi**.
+
 ## Phase 3 — Ticket-03 "Đèn cạn dầu" (Contract v1.2)
 
 Quyết định thiết kế: [docs/adr/0001-lantern-fuel-and-dawn-win.md](docs/adr/0001-lantern-fuel-and-dawn-win.md).

@@ -1,0 +1,21 @@
+E2E (Chrome headless, 1280x720) — 2026-11-20T09:59:11.371Z
+PASS  rebind: clicking an action waits for a key
+PASS  rebind: duplicate key is detected and reported  — ⚠ Trùng phím W: Đi tới, Nhảy
+PASS  rebind: "Khôi phục mặc định" restores defaults  — {"err":"","jump":"Space"}
+PASS  rebind + reduced motion + large text are saved across reloads  — {"pulse":"g","up":"i","hint":"G","rm":true,"big":true}
+PASS  all 9 actions are rebindable
+PASS  rebound movement key moves Mây  — moved 3.75 m
+PASS  reduced motion ON: hit causes no screen flash  — opacity 0
+PASS  reduced motion OFF: hit flashes the screen  — opacity 0.3
+PASS  every text element renders at >= 18 px (1280x720)
+PASS  large text option scales the HUD by 1.25
+PASS  caption + edge arrow when a Bóng Mực appears  — {"text":"⚠ Bóng Mực xuất hiện⚠ Bóng Mực xuất hiện","arrows":2}
+PASS  caption when a lantern drops below 30 fuel
+PASS  caption for the last 10 seconds
+PASS  caption when wind is about to blow (Night 3)
+PASS  after losing a night the name entry is offered  — {"shown":true,"save":"block"}
+PASS  invalid name is rejected in the UI
+PASS  score saved to the leaderboard file on disk  — {"name":"Mây_01","score":0,"nights_won":0,"achieved_at":"2026-11-20T16:59:09.443+07:00","seed":5}
+PASS  leaderboard screen from the main menu lists the entry
+PASS  no JavaScript errors during the run
+19/19 passed

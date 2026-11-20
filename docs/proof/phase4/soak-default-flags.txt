@@ -1,0 +1,1 @@
+{"mem_start_mb":14.5,"mem_end_mb":29.6,"ratio":2.04}

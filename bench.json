@@ -1,0 +1,20 @@
+{
+  "contract_version": "1.3",
+  "avg_fps": 555.2,
+  "p1_low_fps": 291.2,
+  "frame_ms_p95": 2.7,
+  "frames": 16658,
+  "load_ms": 596,
+  "peak_mem_mb": 1078,
+  "vsync_off": true,
+  "renderer": "three.js r170 WebGL2 · ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version) · Chrome/157.0.8103.79",
+  "os": "Darwin 25.6.0 arm64 · Apple M4 · 24 GB RAM",
+  "seed": 42,
+  "duration_s": 30,
+  "viewport": "1280x720",
+  "scene": {
+    "shades": 200,
+    "motes": 100
+  },
+  "notes": "vsync/frame cap disabled with --disable-gpu-vsync --disable-frame-rate-limit; peak_mem_mb = RSS of the whole Chrome process tree during measurement"
+}
