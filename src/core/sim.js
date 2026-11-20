@@ -63,7 +63,9 @@ export function createSim(tuning, opts = {}) {
     lanterns: map.lanterns.map(l => ({ id: l.id, pos: [...l.pos], charge: 0, lit: false, fuel: 0, everLit: false, relitCount: 0 })),
     motes: [], shades: [], drifters: [], charms: [],
     wind: { active: false, dirDeg: 0, left: 0, warn: false, nextDir: 0 },
-    flags: { randomDrifters: scn.random_drifters ?? true, windEnabled: scn.wind_enabled ?? map.wind, spawnShades: scn.spawn_shades ?? true, spawnMotes: scn.spawn_motes ?? true },
+    flags: { randomDrifters: scn.random_drifters ?? !scn.bench, windEnabled: scn.wind_enabled ?? (scn.bench ? false : map.wind), spawnShades: scn.spawn_shades ?? !scn.bench, spawnMotes: scn.spawn_motes ?? !scn.bench,
+      // Ticket-04 bench scene: no damage, no pickup, no fuel decay, no end, shades only wander. All false in normal play.
+      bench: !!scn.bench },
     ids: { mote: 1, shade: 1, drifter: 1 },
     prevBtn: { jump: false, interact: false, pulse: false, dash: false, pause: false },
     score: { motes: 0, lanterns: 0, relights: 0, pulseHits: 0, pulseDrainHits: 0 },
@@ -179,7 +181,7 @@ export function createSim(tuning, opts = {}) {
     if (s.flags.windEnabled) windTimers();
     // 2b. fuel: decay + drain by shades that were draining at the start of this tick (ADR 0001)
     for (const l of s.lanterns) {
-      if (!l.lit) continue;
+      if (!l.lit || s.flags.bench) continue;
       const drainers = s.shades.filter(sh => sh.state === 'drain' && sh.target === l.id);
       l.fuel -= DECAY + DRAIN * drainers.length;
       for (const sh of drainers) if (++sh.drainTicks % FUEL_DRAIN_EVENT_EVERY === 0) ev('fuel_drain', { lantern_id: l.id, shade_id: sh.id, fuel: fuelOut(l) });
@@ -201,7 +203,7 @@ export function createSim(tuning, opts = {}) {
 
     const active = p.respawnWait === 0;
     // 4. pick up motes and charms
-    if (active) {
+    if (active && !s.flags.bench) {
       for (const m of [...s.motes].sort(byId)) {
         if (p.carried >= capacity()) break;
         if (m.readyTick > s.tick) continue;
@@ -272,7 +274,7 @@ export function createSim(tuning, opts = {}) {
     for (const sh of s.shades) moveShade(sh);
     for (const d of s.drifters) moveDrifter(d);
     // 9. touches: drifters steal first, then shades hit (ascending id)
-    if (active) {
+    if (active && !s.flags.bench) {
       for (const d of [...s.drifters].sort(byId)) {
         if ((d.state === 'idle' || d.state === 'chase') && !d.hasStolen && p.carried > 0 && xz(d.pos, p.pos) <= DRIFTER_TOUCH) {
           const amt = Math.min(DRIFTER_STEAL, p.carried);
@@ -307,7 +309,8 @@ export function createSim(tuning, opts = {}) {
     if (map.drifters && s.flags.randomDrifters && s.simTick % DRIFTER_EVERY === 0) spawnDrifter();
     // 11. win / lose
     // Ticket-03: no early win. no_flames first; at dawn win iff lit >= ceil(win_ratio * total).
-    if (p.flames <= 0) end('lost', 'no_flames');
+    if (s.flags.bench) { /* bench: no end condition */ }
+    else if (p.flames <= 0) end('lost', 'no_flames');
     else if (s.timeLeft <= 0) {
       const lit = s.lanterns.filter(l => l.lit).length, need = Math.ceil(T.win_ratio * s.lanterns.length - 1e-9);
       if (lit >= need) end('won', 'dawn_survived'); else end('lost', 'dawn');
@@ -433,7 +436,7 @@ export function createSim(tuning, opts = {}) {
       if (sh.left === 0) { sh.state = 'wander'; sh.turn = 0; }
       clampSafe(sh); return;
     }
-    const d = xz(sh.pos, p.pos), canSee = p.respawnWait === 0;
+    const d = xz(sh.pos, p.pos), canSee = p.respawnWait === 0 && !s.flags.bench;
     if (sh.state === 'drain') {   // Ticket-03: leave drain -> chase (Mây within 6 m) / wander (lantern out, fuel >= 30, > 2 m)
       const L = s.lanterns.find(l => l.id === sh.target);
       if (canSee && d <= DRAIN_BREAK_DIST) { sh.state = 'chase'; sh.target = null; }
