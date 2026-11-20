@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command",
+        "command": "cd \"$CLAUDE_PROJECT_DIR\" && npm test --silent >/tmp/ddl-test.log 2>&1 || { echo 'npm test đang đỏ — sửa trước khi kết thúc:' >&2; tail -30 /tmp/ddl-test.log >&2; exit 2; }" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Edit|Write",
+        "hooks": [ { "type": "command",
+          "command": "cd \"$CLAUDE_PROJECT_DIR\" && node --check src/core/sim.js && node --check src/headless.js >/dev/null 2>&1 || { echo 'Lỗi cú pháp trong core/headless' >&2; exit 2; }" } ] }
+    ]
+  }
+}
