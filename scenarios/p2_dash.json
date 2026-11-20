@@ -1,0 +1,2 @@
+{ "night": 1, "seed": 1, "ticks": 120, "snapshot_every": 30, "spawn_shades": false,
+  "inputs": [ { "tick": 1, "move": [1, 0], "dash": true }, { "tick": 2, "move": [1, 0] }, { "tick": 60, "jump": true }, { "tick": 61 }, { "tick": 70, "dash": true }, { "tick": 71 } ] }

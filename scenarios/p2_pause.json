@@ -1,0 +1,2 @@
+{ "night": 3, "seed": 1, "ticks": 200, "snapshot_every": 20,
+  "inputs": [ { "tick": 1, "move": [0, 1] }, { "tick": 40, "pause": true }, { "tick": 41 }, { "tick": 100, "pause": true }, { "tick": 101, "move": [1, 0] } ] }
