@@ -1,0 +1,9 @@
+✔ CLI: scenario files produce valid JSON, identical across two runs (273.442667ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 367.729084
