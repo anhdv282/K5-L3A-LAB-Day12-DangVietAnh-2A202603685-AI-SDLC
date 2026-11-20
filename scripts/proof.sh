@@ -19,4 +19,4 @@ done > "$OUT/determinism.txt"
   echo "night 3, 21600 ticks: $(( (e - s) / 1000000 )) ms (limit 30000 ms)"; } > "$OUT/perf.txt"
 # autopilot outcome per night (honest: not a requirement, shows the nights are playable end to end)
 for n in 1 2 3; do for s in 1 2 3 4 5 6; do node src/headless.js --night $n --seed $s --bot --snapshot-every 0 | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const j=JSON.parse(d);console.log(`night ${j.night} seed ${j.seed}: ${j.result} ${j.reason||""} ticks=${j.ticks} lit=${j.lanterns_lit}/${j.lantern_count} score=${j.score}`)})'; done; done > "$OUT/bot-nights.txt"
-echo "proof written to $OUT"; grep -E 'pass|fail' "$OUT/test-report.txt"; cat "$OUT/determinism.txt" "$OUT/perf.txt"
+echo "proof written to $OUT"; grep -E 'pass|fail' "$OUT/test-report.txt" || true; cat "$OUT/determinism.txt" "$OUT/perf.txt"
