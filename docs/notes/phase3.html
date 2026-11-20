@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phase 3 – Đèn cạn dầu</title>
+<style>
+  :root{
+    --bg:#f7f5ef; --card:#ffffff; --ink:#1f2333; --muted:#5e6475; --line:#e3dfd3;
+    --accent:#c26a12; --accent-soft:#fff1de; --warn:#b3261e; --warn-soft:#fde8e6; --ok:#2e7d4f; --ok-soft:#e5f4ea;
+    --ask:#5b3cc4; --ask-soft:#efeafd; --code:#f1eee6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12141c; --card:#1b1e29; --ink:#ece9e1; --muted:#a3a8b8; --line:#2c3040;
+      --accent:#ffb347; --accent-soft:#2e2414; --warn:#ff8a80; --warn-soft:#3a1d1b; --ok:#7fd3a0; --ok-soft:#173022;
+      --ask:#b9a6ff; --ask-soft:#241d3d; --code:#232736;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12141c; --card:#1b1e29; --ink:#ece9e1; --muted:#a3a8b8; --line:#2c3040;
+    --accent:#ffb347; --accent-soft:#2e2414; --warn:#ff8a80; --warn-soft:#3a1d1b; --ok:#7fd3a0; --ok-soft:#173022;
+    --ask:#b9a6ff; --ask-soft:#241d3d; --code:#232736;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,"Segoe UI",sans-serif}
+  main{max-width:920px;margin:0 auto;padding:28px 16px 80px}
+  h1{font-size:28px;margin:0 0 4px} h2{font-size:21px;margin:36px 0 10px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:17px;margin:20px 0 6px}
+  .sub{color:var(--muted);margin:0 0 18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .tldr{border-left:4px solid var(--accent);background:var(--accent-soft)}
+  .replace{display:inline-block;font-size:12px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+  .new{display:inline-block;font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-soft);border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+  table{width:100%;border-collapse:collapse;font-size:15px;margin:8px 0}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  th{font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+  code{background:var(--code);border-radius:5px;padding:1px 5px;font-size:.92em}
+  .ask{border-left:4px solid var(--ask);background:var(--ask-soft)}
+  .ask h3{margin-top:0;color:var(--ask)}
+  .q{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line)}
+  .q:first-of-type{border-top:0;padding-top:0}
+  .q b.n{color:var(--ask)}
+  .rec{color:var(--ok);font-weight:600}
+  ul,ol{padding-left:22px} li{margin:3px 0}
+  .muted{color:var(--muted)}
+  .wrap{overflow-x:auto}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <h1>🏮 Phase 3 · Ticket-03 “Đèn cạn dầu”</h1>
+  <p class="sub">Diễn giải lại <code>phase3.md</code> + phân tích ảnh hưởng tới code/test hiện tại + những điểm cần bạn chốt. <span class="pill">Contract v1.2</span> <span class="pill">Tag: phase-3</span> <span class="pill">~30 phút</span></p>
+
+  <div class="card tldr">
+    <b>Tóm tắt một câu:</b> đèn giờ <b>tiêu hao dầu</b> và có thể tắt; Bóng Mực có thể <b>hút dầu</b> đèn yếu; người chơi không còn thắng khi thắp hết đèn mà phải <b>giữ đủ 60% số đèn sáng đến bình minh</b>. Kèm theo: sức chứa tăng dần, công thức điểm mới hoàn toàn, chế độ mù màu, contract v1.2.
+    <br><br><b>Vì sao đổi:</b> người chơi giỏi thắp xong trong 2 phút rồi hết việc, cuối Đêm thiếu căng thẳng. Mục tiêu chuyển từ “thắp hết” sang “giữ đảo sáng”.
+  </div>
+
+  <h2>1. Ticket yêu cầu gì (diễn giải)</h2>
+
+  <h3>1.1 Dầu đèn <span class="replace">THAY THẾ</span></h3>
+  <p class="muted">Thay luật cũ “đèn đã sáng thì không nhận thêm đom đóm”.</p>
+  <ul>
+    <li>Mỗi đèn có dầu, tối đa <b>100</b>. Vừa thắp (lần đầu hay thắp lại) → dầu = 100.</li>
+    <li>Đèn sáng tự hao <b>1 đơn vị/giây</b> (1/60 mỗi tick). Nên lưu dầu bằng số nguyên theo đơn vị 1/60 để không sai số; chỉ làm tròn khi xuất.</li>
+    <li><b>Châm dầu:</b> bấm Tương tác ở đèn đang sáng → dùng <code>min(đang mang, ceil((100 − dầu)/10))</code> đom đóm, mỗi con +10 dầu (không vượt 100). Đèn đầy (dùng 0) thì <b>không được chọn</b>, không phát sự kiện, không cộng điểm.</li>
+    <li>Chọn đèn khi tương tác: chỉ xét đèn <i>nhận được</i> (chưa sáng, hoặc sáng nhưng chưa đầy) → gần nhất, bằng nhau thì id nhỏ hơn.</li>
+    <li><b>Hết dầu</b> (≤ 0): đèn tắt, tiến độ nạp về 0, phát <code>lantern_out</code>, ánh sáng môi trường giảm. Đèn nhớ <code>ever_lit = true</code>.</li>
+    <li><b>Thắp lại:</b> đèn từng sáng chỉ cần <b>5</b> đom đóm; đèn chưa từng sáng vẫn cần 10.</li>
+    <li>Hiển thị thanh dầu; dầu &lt; 30 thì đèn và thanh nhấp nháy chậm 1 Hz.</li>
+  </ul>
+
+  <h3>1.2 Bóng Mực hút dầu <span class="replace">THAY THẾ</span></h3>
+  <p class="muted">Thay luật cũ “Bóng Mực không bao giờ vào vùng an toàn”.</p>
+  <ul>
+    <li>Đèn có dầu <b>&lt; 30</b> mất vùng an toàn (đúng 30 vẫn còn).</li>
+    <li>Chỉ bóng đang <code>wander</code> mới nhắm đèn yếu: đi tới đèn sáng có dầu &lt; 30 gần nhất (bằng nhau → id nhỏ). Không có thì “đi về đèn tắt gần nhất như trước”. Bóng đang <code>chase</code> giữ mục tiêu.</li>
+    <li>Cách đèn ≤ 2 m (XZ) → trạng thái mới <code>drain</code>: đứng yên, hút <b>5 dầu/giây</b>, nhiều con cộng dồn, đèn vẫn tự hao 1/giây.</li>
+    <li>Rời <code>drain</code>: → <code>chase</code> nếu Mây vào trong 6 m; → <code>stunned</code> nếu trúng Tỏa Sáng; → <code>wander</code> nếu đèn tắt, dầu được châm lên ≥ 30, hoặc cách đèn &gt; 2 m. Hết choáng → <code>wander</code>.</li>
+    <li>Châm đèn lên ≥ 30 khi có bóng trong vùng 6 m → bóng bị đẩy ra mép trong ≤ 30 tick, không gây sát thương (giống lúc vừa thắp).</li>
+  </ul>
+
+  <h3>1.3 Luật thắng mới <span class="replace">THAY THẾ</span></h3>
+  <table>
+    <tr><th>Mục</th><th>Cũ (Ticket-02)</th><th>Mới (Ticket-03)</th></tr>
+    <tr><td>Thời gian Đêm 1/2/3</td><td>300 / 330 / 360 s</td><td><b>240 / 270 / 300 s</b></td></tr>
+    <tr><td>Thắng</td><td>Thắp hết đèn (kết thúc ngay)</td><td>Còn sống lúc bình minh <b>và</b> số đèn đang sáng ở tick cuối ≥ ceil(0.6 × tổng): <b>3/5, 4/6, 5/7</b></td></tr>
+    <tr><td>Thắng sớm</td><td>Có</td><td><b>Không còn</b></td></tr>
+    <tr><td>Thua</td><td>Hết lửa / hết giờ</td><td>Hết lửa (ngay, kể cả tick cuối) / hết giờ mà dưới ngưỡng</td></tr>
+    <tr><td>Lý do</td><td><code>no_flames</code>, <code>dawn</code></td><td>Thắng <code>dawn_survived</code> · thua <code>dawn</code> hoặc <code>no_flames</code></td></tr>
+    <tr><td>Thứ tự tick</td><td colspan="2">Giữ 12 bước Ticket-02; bước 2 thêm trừ dầu (hao + bị hút), ngay sau đó đèn ≤ 0 tắt; xét thắng/thua cuối tick, hết lửa luôn ưu tiên <code>no_flames</code>.</td></tr>
+  </table>
+
+  <h3>1.4 Sức chứa tăng dần <span class="new">MỚI</span></h3>
+  <p>Sức chứa = <code>10 + 2 × successful_lights</code>, tối đa 20. Đếm mọi lần thắp thành công trong Đêm (cả thắp lại; đèn đặt sẵn bằng scenario không tính), về 0 đầu mỗi Đêm. HUD hiện “đang mang / sức chứa”.</p>
+
+  <h3>1.5 Điểm mới <span class="replace">THAY THẾ toàn bộ</span></h3>
+  <table>
+    <tr><th>Sự kiện</th><th>Điểm</th></tr>
+    <tr><td>Mỗi đom đóm nạp vào đèn (thắp mới, thắp lại, châm dầu)</td><td>+5</td></tr>
+    <tr><td>Thắp lần đầu / thắp lại</td><td>+100 / +40</td></tr>
+    <tr><td>Bóng Mực trúng Tỏa Sáng</td><td>+5 mỗi con; <b>+15 (tổng)</b> nếu nó đang <code>drain</code></td></tr>
+    <tr><td>Bình minh (chỉ khi thắng): mỗi đèn đang sáng</td><td>+50 + floor(dầu)</td></tr>
+    <tr><td>Bình minh (chỉ khi thắng): mỗi Ngọn Lửa còn lại</td><td>+50</td></tr>
+    <tr><td>Thưởng thời gian</td><td><b>Bỏ</b></td></tr>
+  </table>
+
+  <h3>1.6 Chế độ mù màu <span class="new">MỚI</span></h3>
+  <ul>
+    <li>Cài đặt “Bảng màu dễ phân biệt” (lưu lại).</li>
+    <li>Viền và mắt Bóng Mực <code>#7A3CFF → #00B3FF</code>; màu cảnh báo UI <code>#FF5A5F → #FFFFFF</code> kèm ⚠.</li>
+    <li>Đèn tắt/sáng phân biệt không cần màu: đèn tắt <b>xẹp 20%</b> và giấy có <b>vết rách</b>; đèn sắp hết dầu nhấp nháy.</li>
+  </ul>
+
+  <h3>1.7 Test Contract v1.2</h3>
+  <ul>
+    <li><code>contract_version: "1.2"</code>; <code>tuning</code> thêm <code>fuel_max 100, fuel_decay_per_s 1.0, fuel_per_mote 10, relight_cost 5, win_ratio 0.6, drain_per_s 5, low_fuel_threshold 30, capacity_max 20</code>; đổi thời gian Đêm thành 240/270/300.</li>
+    <li>Snapshot: đèn thêm <code>fuel</code> (1 chữ số thập phân, đèn tắt = 0), <code>ever_lit</code>, <code>relit_count</code>; player thêm <code>capacity</code>; Bóng Mực có thêm trạng thái <code>drain</code>.</li>
+    <li>Scenario: đèn đặt được <code>lit, fuel, ever_lit</code> (lit mà không có fuel → 100); player thêm <code>successful_lights</code>; shades thêm <code>target_lantern_id</code>.</li>
+    <li>Sự kiện mới: <code>refuel {lantern_id, amount, fuel}</code>, <code>lantern_out {lantern_id}</code>, <code>fuel_drain {lantern_id, shade_id, fuel}</code> (mỗi 60 tick khi đang hút); <code>lantern_lit</code> thêm <code>relight</code>; <code>game_over.reason</code> thêm <code>dawn_survived</code>, bỏ <code>all_lit</code>.</li>
+  </ul>
+
+  <h3>1.8 DoD</h3>
+  <ol>
+    <li>Bằng chứng game chạy đúng yêu cầu phase.</li>
+    <li>Ít nhất 1 ghi chú quyết định thiết kế (ADR) về mô hình trạng thái đèn và luật thắng.</li>
+    <li>Test cũ bị luật mới làm sai: sửa hoặc xóa <b>có ghi lý do</b>, không skip âm thầm.</li>
+    <li>Changelog liệt kê breaking changes của Phase 3.</li>
+    <li>Test ẩn Phase 1–2 <b>không bị thay thế</b> vẫn đạt.</li>
+  </ol>
+
+  <h2>2. Ảnh hưởng tới code hiện tại</h2>
+  <div class="wrap"><table>
+    <tr><th>Vùng</th><th>Thay đổi dự kiến</th></tr>
+    <tr><td><code>game.contract.json</code></td><td>v1.2: thêm 8 khóa, đổi 3 thời lượng. Test <code>contract sync</code> sẽ tự đỏ nếu sim chưa đọc khóa mới → tốt, buộc phải nối đủ.</td></tr>
+    <tr><td><code>src/core/sim.js</code> – đèn</td><td>Mô hình đèn từ <code>{charge, lit}</code> thành <code>{deposited, lit, fuelUnits (×60), everLit, relitCount}</code>; hao dầu ở bước 2; tắt ngay sau bước 2; chọn đèn mới (gồm đèn sáng chưa đầy); châm dầu; thắp lại 5.</td></tr>
+    <tr><td><code>sim.js</code> – Bóng Mực</td><td>Thêm trạng thái <code>drain</code>; wander có mục tiêu đèn; vùng an toàn chỉ khi dầu ≥ 30; đẩy ra khi châm lên ≥ 30; sự kiện <code>fuel_drain</code>.</td></tr>
+    <tr><td><code>sim.js</code> – thắng/thua, điểm, sức chứa</td><td>Bỏ thắng sớm; ngưỡng 60% lúc bình minh; công thức điểm mới; capacity động.</td></tr>
+    <tr><td><code>src/headless.js</code></td><td>Snapshot/scenario/sự kiện v1.2; giữ tương thích Phase 1–2 (đầu ra là tập cha).</td></tr>
+    <tr><td><code>src/core/campaign.js</code></td><td>Không đổi (tổng điểm và chơi lại giữ nguyên).</td></tr>
+    <tr><td>Bot</td><td>Phải biết châm dầu và giữ đèn tới bình minh, nếu không sẽ thua <code>dawn</code> ở mọi Đêm.</td></tr>
+    <tr><td><code>src/web/</code></td><td>Thanh dầu, nhấp nháy 1 Hz, đèn tắt xẹp + rách, HUD “mang/sức chứa”, mục tiêu “≥ k đèn đến bình minh”, cài đặt mù màu, ánh sáng môi trường giảm khi đèn tắt.</td></tr>
+  </table></div>
+
+  <h3>Test hiện có bị luật mới làm sai (sẽ sửa, ghi lý do, không skip)</h3>
+  <div class="wrap"><table>
+    <tr><th>Test</th><th>Vì sao sai</th><th>Hướng xử lý</th></tr>
+    <tr><td><code>contract 1.1: standard tuning values</code></td><td>Version, thời lượng, khóa mới</td><td>Sửa theo v1.2</td></tr>
+    <tr><td><code>interact … lights at 10</code> (điểm 10×10+100)</td><td>Điểm đom đóm 10 → 5</td><td>Sửa kỳ vọng điểm</td></tr>
+    <tr><td><code>lose … dawn</code> (sim_ticks 18000)</td><td>Đêm 1 còn 240 s</td><td>Sửa thành 14400</td></tr>
+    <tr><td><code>win/lose order: all lit on exact last tick ⇒ win</code></td><td>Luật thắng bị thay</td><td><b>Thay</b> bằng test “≥ 3/5 đèn sáng ở tick bình minh ⇒ <code>dawn_survived</code>”</td></tr>
+    <tr><td><code>autopilot can win night 1</code>, regression <code>win_bot</code></td><td>Không còn thắng sớm</td><td>Đổi kỳ vọng: thắng lúc bình minh (cần bot châm dầu)</td></tr>
+    <tr><td><code>pause</code> (time_left 300 − …)</td><td>Thời lượng mới</td><td>Sửa số</td></tr>
+    <tr><td><code>night chain data</code> (330/360)</td><td>Thời lượng mới</td><td>Sửa 270/300</td></tr>
+    <tr><td><code>safe zone</code></td><td>Vẫn đúng khi dầu ≥ 30</td><td>Giữ; thêm test dầu &lt; 30 mất vùng an toàn</td></tr>
+    <tr><td><code>shade states</code> (danh sách 5 tên)</td><td>Thêm <code>drain</code></td><td>Sửa danh sách 6 tên</td></tr>
+    <tr><td><code>performance</code> (21.600 tick)</td><td>Đêm 3 còn 18.000 tick</td><td>Giữ 21.600 (khó hơn yêu cầu) hoặc đổi theo; ghi chú</td></tr>
+  </table></div>
+
+  <div class="card ask">
+    <h3>3. Cần bạn chốt</h3>
+    <p class="muted" style="margin-top:0">Mỗi câu có đề xuất của mình (<span class="rec">màu xanh</span>). Bạn chỉ cần trả lời “đồng ý hết” hoặc nêu số câu muốn đổi.</p>
+
+    <div class="q"><b class="n">Q1.</b> Ticket ghi bóng wander “đi về đèn tắt gần nhất <i>như trước</i>”, nhưng bản hiện tại của mình cho wander <b>đi ngẫu nhiên</b> (giả định A2 ở Phase 2). Đổi không?
+      <br><span class="rec">Đề xuất:</span> làm theo ticket. Wander nhắm đèn sáng có dầu &lt; 30 gần nhất; không có thì đi về đèn <b>tắt</b> gần nhất, tới nơi (≤ 2 m) thì lượn quanh ngẫu nhiên. Cập nhật A2 kèm lý do.</div>
+
+    <div class="q"><b class="n">Q2.</b> Ticket nhắc <code>game_over.reason</code> (gợi ý có sự kiện <code>game_over</code>), trong khi mình đang phát <code>win</code>/<code>lose</code>.
+      <br><span class="rec">Đề xuất:</span> phát thêm <code>game_over {reason}</code> và giữ <code>win</code>/<code>lose</code> để không phá tương thích.</div>
+
+    <div class="q"><b class="n">Q3.</b> Ticket gọi tiến độ nạp là <code>deposited</code>; snapshot của mình đang dùng <code>charge</code>.
+      <br><span class="rec">Đề xuất:</span> xuất cả hai (<code>deposited</code> và <code>charge</code>, cùng giá trị).</div>
+
+    <div class="q"><b class="n">Q4.</b> <code>fuel_drain</code> “ghi mỗi 60 tick khi đang hút”: đếm 60 tick theo từng bóng (tính từ lúc nó bắt đầu hút) hay theo đồng hồ chung (<code>sim_tick % 60 == 0</code>)?
+      <br><span class="rec">Đề xuất:</span> đếm theo từng bóng: tick thứ 60, 120… kể từ khi vào <code>drain</code>.</div>
+
+    <div class="q"><b class="n">Q5.</b> “Châm lên ≥ 30 khi có bóng trong 6 m thì đẩy ra”: chỉ khi dầu <b>vượt ngưỡng từ &lt; 30 lên ≥ 30</b>, hay mỗi lần châm?
+      <br><span class="rec">Đề xuất:</span> chỉ khi vượt ngưỡng (đèn ≥ 30 vốn đã có vùng an toàn, bóng không ở trong được).</div>
+
+    <div class="q"><b class="n">Q6.</b> Đẩy bóng ra khi đèn <b>thắp lại</b> (dầu = 100): áp dụng như lúc thắp lần đầu?
+      <br><span class="rec">Đề xuất:</span> có, ticket ghi “giống khi đèn vừa thắp”.</div>
+
+    <div class="q"><b class="n">Q7.</b> Test hiệu năng: Đêm 3 giờ chỉ 18.000 tick. Giữ test 21.600 tick (vẫn ≤ 30 s, khắt khe hơn yêu cầu) hay đổi theo?
+      <br><span class="rec">Đề xuất:</span> giữ 21.600 tick và ghi chú lý do.</div>
+
+    <div class="q"><b class="n">Q8.</b> Phase 3 chỉ ~30 phút. Nếu thiếu giờ thì cắt phần nào?
+      <br><span class="rec">Đề xuất:</span> ưu tiên logic + headless + test + ADR + changelog (phần test ẩn chấm). Phần hình ảnh: thanh dầu, nhấp nháy, HUD sức chứa, cài đặt mù màu là bắt buộc làm; vết rách trên giấy đèn làm đơn giản (một mảnh tối trên thân đèn). Bot: chỉ thêm “châm dầu đèn yếu nhất”, không tối ưu thêm.</div>
+
+    <div class="q"><b class="n">Q9.</b> Sáng tạo Phase 3: thêm gì không? (Ví dụ: Thỏ Ngọc giật tai khi đèn gần đó sắp cạn dầu, chỉ ở lớp hiển thị.)
+      <br><span class="rec">Đề xuất:</span> không thêm gì mới ở phase này vì thời gian ngắn; giữ nguyên phần sáng tạo cũ, chỉ chỉnh cho hợp luật mới.</div>
+
+    <div class="q"><b class="n">Q10.</b> Commit/tag: khi xong và test xanh, mình commit nhỏ + gắn tag <code>phase-3</code> + push luôn?
+      <br><span class="rec">Đề xuất:</span> có, sau khi CI xanh.</div>
+  </div>
+
+  <h2>4. Kế hoạch (kiểm chứng trước khi code)</h2>
+  <ol>
+    <li><b>ADR</b> <code>docs/adr/0001-lantern-fuel-and-dawn-win.md</code>: mô hình trạng thái đèn mới (chưa thắp → sáng → yếu → tắt → thắp lại), luật thắng mới, vì sao lưu dầu bằng tick nguyên, phương án đã cân nhắc.</li>
+    <li><b>Viết test trước</b> (chạy thấy đỏ, lưu <code>tdd-red</code>): hao dầu 1/s, châm dầu đúng công thức, đèn đầy không được chọn, hết dầu → <code>lantern_out</code>, thắp lại 5, dầu &lt; 30 mất vùng an toàn, wander nhắm đèn yếu → <code>drain</code> 5/s cộng dồn, các lối thoát khỏi drain, đẩy ra khi châm ≥ 30, thắng <code>dawn_survived</code> đúng ngưỡng 3/5–4/6–5/7, không thắng sớm, hết lửa ở tick cuối vẫn <code>no_flames</code>, sức chứa tăng 2 mỗi lần thắp (tối đa 20), điểm mới (gồm +15 khi trúng bóng đang drain, thưởng bình minh), contract v1.2 và các trường snapshot/scenario/sự kiện mới.</li>
+    <li><b>Sửa test cũ</b> theo bảng mục 2; ghi lý do trong ADR/changelog.</li>
+    <li><b>Code</b> sim → headless → bot → giao diện.</li>
+    <li><b>Kiểm chứng:</b> <code>npm test</code>, hồi quy Phase 1–2 (fixtures), tất định, hiệu năng, FPS, ảnh đèn yếu/tắt/mù màu, bot sống tới bình minh.</li>
+    <li><b>CHANGELOG.md</b> mục “Phase 3 – Breaking changes”, cập nhật AGENTS.md (chỉ khi có lỗi lặp lại) và skill <code>verify</code>.</li>
+    <li>Commit nhỏ → tag <code>phase-3</code> → push → kiểm CI.</li>
+  </ol>
+
+  <h2>5. Phần “Harness” trong ticket: mình đang ở đâu</h2>
+  <table>
+    <tr><th>Thành phần</th><th>Hiện có</th><th>Phase 3 dự kiến</th></tr>
+    <tr><td>AGENTS.md / CLAUDE.md</td><td>Có, ~45 dòng, cập nhật qua 2 phase</td><td>Chỉ thêm dòng khi agent lặp lỗi; có thể rút gọn để đỡ tốn token</td></tr>
+    <tr><td>Skill</td><td><code>verify</code>: chạy test, sinh bằng chứng, chụp ảnh, đo FPS</td><td>Cập nhật cho phase 3</td></tr>
+    <tr><td>Hook</td><td>Stop: chặn kết thúc khi <code>npm test</code> đỏ; PostToolUse: kiểm cú pháp core</td><td>Giữ nguyên</td></tr>
+    <tr><td>Kiểm tra tự động thay cho lời dặn</td><td>Test <code>contract sync</code>, <code>architecture</code>, <code>phase1-regression</code>, CI</td><td>Thêm fixtures Phase 2 vào hồi quy</td></tr>
+    <tr><td>Reviewer độc lập</td><td><b>Chưa có</b> (người viết và người đánh giá đang là cùng một agent)</td><td><span class="rec">Đề xuất:</span> sau khi code xong, chạy 1 subagent review riêng (đọc diff + bằng chứng, tìm test giả, luật sai). Sẽ tốn thêm token, bạn cho phép thì mình làm. <b>(Q11)</b></td></tr>
+  </table>
+
+  <p class="muted" style="margin-top:28px">Trả lời Q1–Q11 (hoặc “đồng ý hết”) là mình bắt đầu. File này chỉ là ghi chú, chưa có thay đổi code nào.</p>
+</main>
+</body>
+</html>
