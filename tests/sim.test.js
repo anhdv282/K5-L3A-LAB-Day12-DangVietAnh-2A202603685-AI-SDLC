@@ -14,7 +14,7 @@ const run = (n, f) => { for (let i = 0; i < n; i++) f(); };
 
 // [Ticket-03] contract 1.1 -> 1.2: version, night durations 240/270/300 and the score table were replaced (CHANGELOG).
 test('contract 1.2: standard tuning values (Ticket-02 numbers kept, Ticket-03 durations/score)', () => {
-  assert.equal(CONTRACT.contract_version, '1.2');
+  assert.equal(CONTRACT.contract_version, '1.3');   // [Ticket-04] 1.2 -> 1.3 (adds bench_cmd/soak_cmd; v1.2 tuning unchanged)
   const want = { player_speed: 6, carry_capacity: 10, lantern_cost: 10, lantern_count_night1: 5, pickup_radius: 1, interact_radius: 2,
     pulse_cost: 3, pulse_radius: 5, night1_duration_s: 240, night2_duration_s: 270, night3_duration_s: 300, flames: 3, invuln_s: 1.5,
     hit_drop_ratio: 0.5, pulse_stun_s: 2, pulse_push_m: 4, pulse_cooldown_s: 3, safe_radius: 6, shade_speed: 4, shade_hit_radius: 1,
@@ -124,7 +124,7 @@ test('contract sync: commands in game.contract.json are runnable', async () => {
   const { readFileSync } = await import('node:fs');
   const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
   assert.equal(CONTRACT.build_cmd, 'npm install');
-  assert.equal(CONTRACT.run_cmd, 'npm start'); assert.ok(pkg.scripts.start);
+  assert.equal(CONTRACT.run_cmd, 'node server.js'); assert.equal(pkg.scripts.start, 'node server.js');   // [Ticket-04] run_cmd must accept --export-leaderboard
   const [cmd, ...args] = CONTRACT.headless_cmd.split(' ');
   const out = JSON.parse(execFileSync(cmd, [...args, '--night', '1', '--ticks', '10'], { encoding: 'utf8' }));
   assert.equal(out.contract_version, CONTRACT.contract_version); assert.equal(out.team, CONTRACT.team);

@@ -14,7 +14,7 @@ const at = (dz = -1.5) => [L1[0], 0, L1[2] + dz];   // standing next to L1
 const fuelOf = (sim, i = 0) => sim.snapshot().lanterns[i].fuel;
 
 test('contract 1.2: new tuning keys and durations', () => {
-  assert.equal(CONTRACT.contract_version, '1.2');
+  assert.equal(CONTRACT.contract_version, '1.3');   // [Ticket-04] 1.2 -> 1.3 (adds bench_cmd/soak_cmd; v1.2 tuning unchanged)
   const want = { fuel_max: 100, fuel_decay_per_s: 1, fuel_per_mote: 10, relight_cost: 5, win_ratio: 0.6, drain_per_s: 5,
     low_fuel_threshold: 30, capacity_max: 20, night1_duration_s: 240, night2_duration_s: 270, night3_duration_s: 300 };
   for (const [k, v] of Object.entries(want)) assert.equal(T[k], v, k);

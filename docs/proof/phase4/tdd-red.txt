@@ -1,0 +1,5 @@
+ℹ fail 1
+ℹ pass 62
+ℹ tests 63
+✖ failing tests:
+✖ tests/phase4.test.js
