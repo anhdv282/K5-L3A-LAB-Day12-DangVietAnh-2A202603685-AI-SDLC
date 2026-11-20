@@ -2,33 +2,90 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Đảo Đèn Lồng – Đêm 1</title>
+<title>Đảo Đèn Lồng</title>
 <style>
-  html,body{margin:0;height:100%;overflow:hidden;background:#141a3a;font-family:system-ui,"Segoe UI",sans-serif;color:#fff4e0}
+  :root{--text:#F5F1E6;--danger:#FF5A5F;--gold:#F2C14E;--lamp:#FFB347;--panel:rgba(14,20,48,.72)}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0E1430;font-family:system-ui,"Segoe UI",sans-serif;color:var(--text)}
   canvas{display:block}
-  #hud{position:fixed;inset:12px auto auto 12px;background:rgba(20,16,40,.55);border:1px solid rgba(255,190,110,.35);border-radius:12px;padding:10px 14px;line-height:1.55;font-size:15px;min-width:220px;pointer-events:none}
-  #hud b{color:#ffcf7a} .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:4px}
-  .bar>i{display:block;height:100%;background:linear-gradient(90deg,#ffb347,#ffe08a)}
-  #score{position:fixed;top:12px;right:12px;font-size:22px;font-weight:700;color:#ffd98a;text-shadow:0 2px 6px #000a;pointer-events:none}
-  #toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);font-size:22px;color:#ffe3a3;text-shadow:0 2px 8px #000;opacity:0;transition:opacity .3s;pointer-events:none}
-  #help{position:fixed;left:12px;bottom:12px;font-size:13px;opacity:.8;pointer-events:none}
-  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(12,10,30,.72)}
-  .card{max-width:520px;margin:16px;background:linear-gradient(#2b2350,#1c1838);border:2px solid #ffb35c;border-radius:18px;padding:22px 26px;box-shadow:0 0 40px #ff9d3c55;text-align:center}
-  .card h1{margin:.1em 0;color:#ffcf7a} .card p{line-height:1.5}
-  button{font-size:18px;padding:10px 26px;border-radius:999px;border:0;background:#ffb347;color:#2a1640;font-weight:700;cursor:pointer;margin-top:10px}
+  .hud{position:fixed;pointer-events:none;text-shadow:0 2px 6px #000c}
+  #flames{top:14px;left:16px;font-size:30px;letter-spacing:4px}
+  #flames .off{opacity:.2;filter:grayscale(1)}
+  #timer{top:12px;left:50%;transform:translateX(-50%);font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+  #timer.danger{color:var(--danger);animation:blink .6s steps(2) infinite}
+  @keyframes blink{50%{opacity:.35}}
+  #topright{top:14px;right:16px;text-align:right;font-size:20px;line-height:1.4}
+  #topright b{color:var(--gold)} #nightname{font-size:14px;opacity:.85}
+  #motebar{bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+  #motebar i{width:22px;height:22px;border-radius:50%;border:2px solid rgba(242,193,78,.6);background:rgba(255,255,255,.06)}
+  #motebar i.on{background:radial-gradient(#FFF6C2,#FFE58A 60%,#FFB347);box-shadow:0 0 10px #FFE58A}
+  #cds{bottom:16px;right:16px;display:flex;gap:10px}
+  .cd{width:58px;height:58px;border-radius:12px;background:var(--panel);border:2px solid var(--gold);position:relative;overflow:hidden;text-align:center;font-size:12px}
+  .cd span{position:relative;z-index:1;display:block;padding-top:8px;line-height:1.2} .cd span b{font-size:18px}
+  .cd .fill{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6)}
+  .cd.dim{opacity:.45}
+  #prompt{bottom:70px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--lamp);border-radius:999px;padding:6px 16px;font-size:18px;display:none}
+  #charm{bottom:70px;right:16px;color:#ff8a8a;font-size:14px;display:none}
+  #arrow{width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:30px solid var(--lamp);filter:drop-shadow(0 0 6px #FFB347);display:none}
+  #toast{top:22%;left:50%;transform:translateX(-50%);font-size:22px;color:#FFE9B0;opacity:0;transition:opacity .3s}
+  #fps{bottom:4px;left:6px;font-size:12px;opacity:.7}
+  #help{bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;opacity:.55;white-space:nowrap;display:none}
+  .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,10,28,.74)}
+  .overlay.show{display:flex}
+  .card{max-width:560px;margin:16px;background:linear-gradient(#1B2350,#0E1430);border:2px solid var(--lamp);border-radius:18px;padding:22px 28px;box-shadow:0 0 40px #FFB34744;text-align:center}
+  .card h1{margin:.1em 0;color:var(--gold)} .card p{line-height:1.55}
+  .card .oldman{font-style:italic;color:#FFE9B0}
+  button{font-size:17px;padding:9px 24px;border-radius:999px;border:0;background:var(--lamp);color:#1b1230;font-weight:700;cursor:pointer;margin:6px}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--gold)}
   table{margin:8px auto;border-collapse:collapse} td{padding:2px 10px;text-align:left} td+td{text-align:right}
+  label{display:block;margin:10px 0} input[type=range]{width:220px;vertical-align:middle}
 </style>
 <script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
 </head>
 <body>
-<div id="hud"></div><div id="score"></div><div id="toast"></div>
-<div id="help">WASD/←↑→↓: đi · Space: nhảy · E: nạp đèn · F: tỏa sáng · Chuột kéo: xoay camera · M: tắt/bật nhạc · R: chơi lại</div>
-<div id="start" class="overlay"><div class="card">
-  <h1>🏮 Đảo Đèn Lồng</h1><h3>Đêm 1 – Đảo Bến</h3>
-  <p>Sương đen đã nuốt ánh sáng của đảo. Hãy giúp <b>Mây</b> gom đom đóm và mang về thắp lại <b>5 Đèn Lồng Lớn</b>.<br>
-  Coi chừng <b style="color:#c69cff">Bóng Mực</b>: chạm vào là mất một ngọn lửa. Tỏa sáng (F) để xua chúng, nhưng tốn 2 đốm sáng. Bóng Mực sợ đèn đã thắp.</p>
-  <button id="go">Bắt đầu</button></div></div>
-<div id="end" class="overlay" style="display:none"><div class="card"><h1 id="endTitle"></h1><p id="endMsg"></p><table id="endTable"></table><button id="again">Chơi lại (R)</button></div></div>
+<div id="flames" class="hud"></div>
+<div id="timer" class="hud"></div>
+<div id="topright" class="hud"></div>
+<div id="motebar" class="hud"></div>
+<div id="cds" class="hud">
+  <div class="cd" id="cdDash"><div class="fill"></div><span><b>⇧</b><br>Lướt</span></div>
+  <div class="cd" id="cdPulse"><div class="fill"></div><span><b>F</b><br>Tỏa sáng</span></div>
+</div>
+<div id="prompt" class="hud"></div>
+<div id="charm" class="hud"></div>
+<div id="arrow" class="hud"></div>
+<div id="toast" class="hud"></div>
+<div id="fps" class="hud"></div>
+<div id="help" class="hud">WASD: đi · Space: nhảy · Shift: lướt · E: nạp đèn · F: tỏa sáng · kéo chuột: camera · Esc/P: tạm dừng · M: nhạc</div>
+
+<div id="ovMenu" class="overlay show"><div class="card">
+  <h1>🏮 Đảo Đèn Lồng</h1>
+  <p>Sương đen đã nuốt ánh sáng của quần đảo giữa biển mây. Hãy giúp <b>Mây</b>, người giữ đèn nhỏ tuổi, gom đom đóm và thắp lại các Đèn Lồng Lớn qua <b>3 Đêm</b>.</p>
+  <button id="btnStart">Bắt đầu</button> <button class="ghost" id="btnMenuSettings">Cài đặt</button>
+  <p style="font-size:13px;opacity:.7">WASD đi · Space nhảy · Shift lướt · E nạp đèn · F tỏa sáng · Esc/P tạm dừng</p>
+</div></div>
+<div id="ovIntro" class="overlay"><div class="card">
+  <h1 id="introTitle"></h1><p class="oldman" id="introText"></p>
+  <button id="btnPlay">Vào Đêm</button>
+</div></div>
+<div id="ovResult" class="overlay"><div class="card">
+  <h1 id="resTitle"></h1><p id="resMsg"></p><table id="resTable"></table>
+  <button id="btnNext">Đêm kế tiếp</button> <button id="btnRetry">Chơi lại Đêm</button> <button class="ghost" id="btnResMenu">Về menu</button>
+</div></div>
+<div id="ovDawn" class="overlay"><div class="card" style="background:linear-gradient(#3b3a78,#ffb36b55)">
+  <h1>🌅 Bình Minh</h1><p class="oldman">"Cả quần đảo sáng rồi đấy, Mây. Ông biết cháu làm được mà." — Ông Đăng</p>
+  <table id="dawnTable"></table><button id="btnDawnMenu">Về menu</button>
+</div></div>
+<div id="ovPause" class="overlay"><div class="card">
+  <h1>Tạm dừng</h1>
+  <button id="btnResume">Tiếp tục</button><br><button id="btnPauseRetry">Chơi lại Đêm</button><br>
+  <button class="ghost" id="btnPauseSettings">Cài đặt</button><br><button class="ghost" id="btnPauseMenu">Về menu</button>
+</div></div>
+<div id="ovSettings" class="overlay"><div class="card">
+  <h1>Cài đặt</h1>
+  <label>Âm lượng <input type="range" id="setVol" min="0" max="1" step="0.05"> <span id="setVolV"></span></label>
+  <label>Độ nhạy chuột <input type="range" id="setSens" min="0.2" max="3" step="0.1"> <span id="setSensV"></span></label>
+  <button id="btnSettingsBack">Xong</button>
+</div></div>
 <script type="module" src="/src/web/main.js"></script>
 </body>
 </html>
