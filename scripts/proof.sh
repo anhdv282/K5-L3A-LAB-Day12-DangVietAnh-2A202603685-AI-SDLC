@@ -2,7 +2,7 @@
 # Regenerate proof from the current code. Output is never hand-edited.  Usage: ./scripts/proof.sh [phase]  (default 2)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PH=${1:-3}; OUT=docs/proof/phase$PH; mkdir -p "$OUT"
+PH=${1:-4}; OUT=docs/proof/phase$PH; mkdir -p "$OUT"
 npm test 2>&1 | grep -E '^(✔|✖|ℹ (tests|pass|fail))' > "$OUT/test-report.txt" || true
 for f in scenarios/*.json; do n=$(basename "$f" .json); node src/headless.js --scenario "$f" > "$OUT/$n.json"; done
 # determinism: same input twice must be byte-identical
