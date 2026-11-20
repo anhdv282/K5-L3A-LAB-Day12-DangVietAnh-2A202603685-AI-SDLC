@@ -1,12 +1,12 @@
 # AGENTS.md — Đảo Đèn Lồng
 
-Game 3D (three.js), 3 Đêm, Test Contract = `game.contract.json` (v1.1). Node ≥ 20, không framework.
+Game 3D (three.js), 3 Đêm, Test Contract = `game.contract.json` (v1.2). Node ≥ 20, không framework.
 
 ## Lệnh
 - Cài: `npm install` · Chạy game: `npm start` → http://localhost:5173
 - Test (unit + scenario + tất định): `npm test`
 - Headless: `node src/headless.js --night 2 --scenario scenarios/p2_drifter.json` (xem `--help`)
-- Sinh lại bằng chứng: `./scripts/proof.sh 2` (ghi vào `docs/proof/phase2/`) · Đo FPS: `node scripts/fps.mjs 3 20`
+- Sinh lại bằng chứng: `./scripts/proof.sh 3` (ghi vào `docs/proof/phase3/`) · Đo FPS: `node scripts/fps.mjs 3 20`
 
 ## Ba điều bắt buộc + bản quyền
 1. **Game đúng yêu cầu**: khách chấm theo yêu cầu đã nêu, không chấm độ lung linh. Làm đúng và chứng minh được trước, trau chuốt sau.
@@ -35,6 +35,8 @@ Logic game phải chạy độc lập với thư viện đồ họa để phục
 - Đổi luật ⇒ cập nhật test + `docs/notes/` (giả định) cùng commit. Test cũ bị thay: sửa và ghi lý do trong bảng "Test bị thay", không tắt.
 - Mỗi tính năng mới cần ≥ 1 scenario headless trong `tests/phase2.test.js` hoặc `scenarios/`.
 - **Chống hồi quy:** scenario của phase cũ được chép nguyên văn vào `tests/fixtures/phaseN/` và phải luôn chạy được (`tests/phase1-regression.test.js`). Không xóa/đổi định dạng headless cũ; chỉ mở rộng (đầu ra là tập cha).
+- **Luật bị thay (change request):** ghi ADR trong `docs/adr/`, breaking changes trong `CHANGELOG.md`; test cũ sửa kèm nhãn `[Ticket-NN]` + lý do ngay trong test. Không skip, không xóa âm thầm.
+- Dầu đèn lưu bằng số nguyên đơn vị 1/60 (`fuelUnits`); không dùng float cho bộ đếm luật.
 - **Kiểm chứng trước khi code:** viết test cho yêu cầu mới, chạy thấy đỏ, lưu kết quả đỏ, rồi mới code.
 - Bài học: khi test đỏ, kiểm tra **kỳ vọng của test** trước (đã 3 lần test sai: khoảng cách, off-by-one tick) rồi mới sửa luật.
 - Không dùng nhân vật/nhạc có bản quyền (RULES §8). Asset mới ghi vào `CREDITS.md`.
